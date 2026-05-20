@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ahmed Arafa — Backend Software Engineer</title>
+<meta name="description" content="Ahmed Arafa — Backend Software Engineer. Building scalable systems with PHP & Laravel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ──────────────────────────────────────────────────────────
+     THEME — pure black & white, neutral grays only
+     ────────────────────────────────────────────────────────── */
+  :root[data-theme="dark"] {
+    --bg:        #0a0a0a;
+    --bg-soft:   #111111;
+    --bg-elev:   #161616;
+    --line:      rgba(255,255,255,0.09);
+    --line-strong: rgba(255,255,255,0.18);
+    --text:      #f5f5f5;
+    --text-soft: #a3a3a3;
+    --text-mute: #6b6b6b;
+    --accent:    #ffffff;
+    --accent-inverse: #0a0a0a;
+    --shadow:    0 10px 40px rgba(0,0,0,0.5);
+    --noise-opacity: 0.025;
+    --particle: rgba(255,255,255,0.45);
+  }
+
+  :root[data-theme="light"] {
+    --bg:        #fafafa;
+    --bg-soft:   #f4f4f4;
+    --bg-elev:   #ffffff;
+    --line:      rgba(0,0,0,0.10);
+    --line-strong: rgba(0,0,0,0.22);
+    --text:      #0a0a0a;
+    --text-soft: #525252;
+    --text-mute: #8a8a8a;
+    --accent:    #0a0a0a;
+    --accent-inverse: #ffffff;
+    --shadow:    0 10px 40px rgba(0,0,0,0.08);
+    --noise-opacity: 0.04;
+    --particle: rgba(0,0,0,0.35);
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     BASE
+     ────────────────────────────────────────────────────────── */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  ::selection { background: var(--text); color: var(--bg); }
+
+  /* subtle film grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: var(--noise-opacity);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  /* background canvas */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  /* ──────────────────────────────────────────────────────────
+     NAV
+     ────────────────────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 3rem;
+    background: color-mix(in srgb, var(--bg) 75%, transparent);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.5s ease, border-color 0.5s ease;
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-logo::before {
+    content: '';
+    display: block;
+    width: 8px; height: 8px;
+    background: var(--text);
+    border-radius: 50%;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    position: relative;
+    padding: 0.25rem 0;
+    transition: color 0.25s;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -2px;
+    width: 0; height: 1px;
+    background: var(--text);
+    transition: width 0.3s ease;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .theme-toggle {
+    width: 38px; height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .theme-toggle:hover { border-color: var(--line-strong); transform: rotate(15deg); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .sun-icon  { display: none; }
+  .theme-toggle .moon-icon { display: block; }
+  :root[data-theme="light"] .theme-toggle .sun-icon  { display: block; }
+  :root[data-theme="light"] .theme-toggle .moon-icon { display: none; }
+
+  .nav-cta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent-inverse);
+    background: var(--accent);
+    padding: 0.6rem 1.3rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: transform 0.25s, opacity 0.25s;
+    border: 1px solid var(--accent);
+  }
+  .nav-cta:hover { transform: translateY(-1px); opacity: 0.9; }
+
+  /* ──────────────────────────────────────────────────────────
+     HERO
+     ────────────────────────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 9rem 3rem 6rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.25fr 0.85fr;
+    gap: 4.5rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 1px;
+    background: var(--text-soft);
+  }
+
+  .hero-name {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.2rem, 7vw, 6rem);
+    font-weight: 500;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text-soft);
+  }
+
+  .hero-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--text-soft);
+    margin-bottom: 1.6rem;
+    max-width: 500px;
+    line-height: 1.5;
+  }
+
+  .hero-desc {
+    font-size: 0.96rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    max-width: 500px;
+    margin-bottom: 2.8rem;
+  }
+
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+
+  .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.95rem 1.8rem;
+    background: var(--accent);
+    color: var(--accent-inverse);
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.25s, opacity 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+  .btn-primary svg { width: 14px; height: 14px; transition: transform 0.25s; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+
+  .btn-secondary {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.95rem 1.8rem;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+    border-radius: 100px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { background: var(--bg-soft); border-color: var(--text); }
+
+  /* ─── HERO PORTRAIT — editorial style ─── */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .hero-portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    transition: transform 0.6s cubic-bezier(0.2,0.9,0.3,1), border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+  .hero-portrait:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+
+  .hero-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: grayscale(100%) contrast(1.02);
+    transition: transform 0.9s cubic-bezier(0.2,0.9,0.3,1), filter 0.5s;
+  }
+  .hero-portrait:hover img { transform: scale(1.03); }
+
+  /* gentle gradient masks for legibility */
+  .hero-portrait::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 18%, transparent 70%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  :root[data-theme="light"] .hero-portrait::before {
+    background:
+      linear-gradient(to bottom, rgba(255,255,255,0.0) 0%, transparent 70%, rgba(0,0,0,0.35) 100%);
+  }
+
+  /* editorial corner labels */
+  .portrait-corner {
+    position: absolute;
+    z-index: 3;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.2rem;
+  }
+  .portrait-corner.tl { top: 0; left: 0; }
+  .portrait-corner.tr { top: 0; right: 0; }
+  .portrait-corner.bl { bottom: 3.6rem; left: 0; }
+  .portrait-corner.br { bottom: 3.6rem; right: 0; }
+
+  .portrait-corner .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+    animation: pulse 2s infinite;
+  }
+
+  /* L-shaped frame brackets at corners */
+  .hero-portrait::after {
+    content: '';
+    position: absolute;
+    inset: 0.6rem;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) top left / 16px 1px no-repeat,
+      linear-gradient(to bottom, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) top left / 1px 16px no-repeat,
+      linear-gradient(to left, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) top right / 16px 1px no-repeat,
+      linear-gradient(to bottom, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) top right / 1px 16px no-repeat,
+      linear-gradient(to right, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) bottom left / 16px 1px no-repeat,
+      linear-gradient(to top, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) bottom left / 1px 16px no-repeat,
+      linear-gradient(to left, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) bottom right / 16px 1px no-repeat,
+      linear-gradient(to top, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 16px, transparent 16px) bottom right / 1px 16px no-repeat;
+    opacity: 0.85;
+  }
+
+  /* floating info card overlapping the photo */
+  .portrait-card {
+    position: absolute;
+    left: 50%;
+    bottom: -1.2rem;
+    transform: translateX(-50%);
+    z-index: 4;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0.9rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    box-shadow: var(--shadow);
+    white-space: nowrap;
+    transition: background 0.5s, border-color 0.5s;
+  }
+  .portrait-card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0 0.4rem;
+    border-right: 1px solid var(--line);
+  }
+  .portrait-card-item:last-child { border-right: 0; }
+  .portrait-card-num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .portrait-card-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-mute);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* tech stack strip beneath portrait */
+  .hero-stack {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.32rem 0.75rem;
+    border-radius: 100px;
+    border: 1px solid var(--line);
+    color: var(--text-soft);
+    background: var(--bg-elev);
+    letter-spacing: 0.02em;
+    transition: all 0.25s;
+  }
+  .pill:hover { border-color: var(--text); color: var(--text); transform: translateY(-1px); }
+
+  /* ─── TECH MARQUEE — full-width scrolling strip ─── */
+  .marquee {
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-soft);
+    padding: 1.4rem 0;
+    position: relative;
+    transition: background 0.5s, border-color 0.5s;
+  }
+  .marquee::before,
+  .marquee::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 120px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .marquee::before { left: 0;  background: linear-gradient(to right, var(--bg-soft), transparent); }
+  .marquee::after  { right: 0; background: linear-gradient(to left,  var(--bg-soft), transparent); }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text-soft);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    white-space: nowrap;
+  }
+  .marquee-item::after {
+    content: '✦';
+    color: var(--text-mute);
+    font-size: 0.7rem;
+    font-style: normal;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SECTION COMMON
+     ────────────────────────────────────────────────────────── */
+  section { padding: 7rem 3rem; position: relative; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--text-mute);
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    margin-bottom: 1rem;
+    line-height: 1.05;
+  }
+  .section-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text-soft);
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: var(--text-soft);
+    max-width: 560px;
+    margin-bottom: 4rem;
+    line-height: 1.7;
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     SKILLS
+     ────────────────────────────────────────────────────────── */
+  #skills { background: var(--bg-soft); transition: background 0.5s ease; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .skill-card {
+    background: transparent;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 2.2rem 2rem;
+    transition: background 0.3s;
+    position: relative;
+  }
+
+  .skill-card:hover { background: var(--bg-elev); }
+
+  .skill-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-mute);
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.06em;
+  }
+
+  .skill-card h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 1.4rem;
+    letter-spacing: -0.02em;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .skill-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    background: var(--bg-elev);
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+  }
+  .skill-card:hover .skill-tag { background: var(--bg-soft); }
+
+  /* ──────────────────────────────────────────────────────────
+     EXPERIENCE
+     ────────────────────────────────────────────────────────── */
+  #experience { background: var(--bg); }
+
+  .timeline {
+    position: relative;
+    border-left: 1px solid var(--line);
+    padding-left: 2.5rem;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 0 0 3.5rem 0;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.55rem; top: 0.5rem;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--text);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .timeline-item:hover::before { background: var(--text); transform: scale(1.15); }
+
+  .timeline-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    margin-bottom: 0.7rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .timeline-company {
+    font-family: 'Fraunces', serif;
+    font-size: 1.45rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.02em;
+  }
+  .timeline-company .loc {
+    color: var(--text-mute);
+    font-weight: 400;
+    font-size: 0.85rem;
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+  }
+
+  .timeline-role {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin-bottom: 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  .timeline-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .timeline-points li {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    padding-left: 1.4rem;
+    position: relative;
+  }
+
+  .timeline-points li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-mute);
+  }
+
+  .timeline-points li strong { color: var(--text); font-weight: 600; }
+
+  /* ──────────────────────────────────────────────────────────
+     PROJECTS
+     ────────────────────────────────────────────────────────── */
+  #projects { background: var(--bg-soft); transition: background 0.5s ease; }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .project-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 2rem;
+    transition: all 0.4s cubic-bezier(0.2,0.9,0.3,1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  .project-card::after {
+    content: '↗';
+    position: absolute;
+    top: 1.6rem;
+    right: 1.8rem;
+    font-size: 1rem;
+    color: var(--text-mute);
+    opacity: 0;
+    transform: translate(-4px, 4px);
+    transition: opacity 0.3s, transform 0.3s, color 0.3s;
+    pointer-events: none;
+  }
+  .project-card:hover::after {
+    opacity: 1;
+    transform: translate(0, 0);
+    color: var(--text);
+  }
+
+  .project-card:hover .project-name {
+    color: var(--text);
+  }
+  .project-card:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 4px;
+  }
+
+  .project-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .project-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-mute);
+    letter-spacing: 0.08em;
+  }
+
+  .project-live {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    padding: 0.25rem 0.7rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .project-card:hover .project-live { color: var(--text); border-color: var(--text); }
+  .project-live::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text);
+    animation: pulse 2s infinite;
+  }
+
+  .project-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.55rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.025em;
+  }
+
+  .project-cat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-mute);
+    margin-bottom: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .project-desc {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .project-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.4rem;
+    flex-grow: 1;
+  }
+  .project-bullets li {
+    font-size: 0.84rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    padding-left: 1.1rem;
+    position: relative;
+  }
+  .project-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-mute);
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .stack-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    padding: 0.22rem 0.6rem;
+    border-radius: 4px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--text-soft);
+  }
+
+  /* ─── OPEN SOURCE ─── */
+  .opensource-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .os-packages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .os-pkg {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.4rem;
+    transition: all 0.3s;
+  }
+  .os-pkg:hover { border-color: var(--line-strong); }
+
+  .os-pkg-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+  }
+
+  .os-pkg-desc {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     CONTACT
+     ────────────────────────────────────────────────────────── */
+  #contact { background: var(--bg); }
+
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 2rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.1rem 1.4rem;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.92rem;
+    transition: all 0.3s cubic-bezier(0.2,0.9,0.3,1);
+    position: relative;
+  }
+  .contact-link:hover {
+    border-color: var(--text);
+    transform: translateX(6px);
+  }
+  .contact-link::after {
+    content: '→';
+    position: absolute;
+    right: 1.4rem;
+    color: var(--text-mute);
+    transition: transform 0.25s, color 0.25s;
+  }
+  .contact-link:hover::after { color: var(--text); transform: translateX(4px); }
+
+  .contact-link-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--text);
+  }
+  .contact-link-icon svg { width: 18px; height: 18px; }
+
+  .contact-link-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-mute);
+    display: block;
+    margin-bottom: 0.15rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Availability card */
+  .avail-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avail-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+  }
+
+  .avail-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .avail-dot::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .avail-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+  .avail-title em { font-style: italic; color: var(--text-soft); font-weight: 400; }
+
+  .avail-desc {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    line-height: 1.75;
+    margin-bottom: 1.8rem;
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     FOOTER
+     ────────────────────────────────────────────────────────── */
+  footer {
+    padding: 2.5rem 3rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-soft);
+    transition: background 0.5s ease;
+  }
+
+  footer p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--text-mute);
+    letter-spacing: 0.02em;
+  }
+
+  .footer-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.9rem;
+    border-radius: 100px;
+    background: var(--bg-elev);
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+  .footer-badge:hover { color: var(--text); border-color: var(--text); }
+
+  /* ──────────────────────────────────────────────────────────
+     SCROLL ANIMATIONS
+     ────────────────────────────────────────────────────────── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(0.2, 0.9, 0.3, 1),
+                transform 0.9s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* Scroll progress bar */
+  #scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--text);
+    z-index: 1000;
+    width: 0%;
+    transition: width 0.1s ease;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-mute); }
+
+  /* ──────────────────────────────────────────────────────────
+     RESPONSIVE
+     ────────────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    #hero { padding: 7rem 1.5rem 5rem; }
+    .hero-inner { grid-template-columns: 1fr; gap: 3.5rem; }
+    .hero-portrait { max-width: 420px; margin: 0 auto; width: 100%; }
+    .portrait-card { padding: 0.8rem 1.1rem; gap: 0.9rem; }
+    .portrait-card-num { font-size: 1.1rem; }
+    .contact-inner { grid-template-columns: 1fr; gap: 2rem; }
+    footer { flex-direction: column; gap: 0.8rem; text-align: center; padding: 2rem 1.5rem; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .marquee-item { font-size: 1.1rem; gap: 2rem; }
+    .marquee-track { gap: 2rem; }
+  }
+
+  @media (max-width: 500px) {
+    .nav-cta { display: none; }
+    .portrait-corner { font-size: 0.58rem; padding: 0.75rem 0.9rem; letter-spacing: 0.1em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .marquee-track { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+<canvas id="bg-canvas"></canvas>
+
+<div class="content">
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Ahmed Arafa</a>
+  <div class="nav-links">
+    <a href="#skills">Skills</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+    <a href="mailto:arafa.dev@gmail.com" class="nav-cta">Hire Me</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag">Backend Software Engineer</div>
+      <h1 class="hero-name">Ahmed<br><em>Arafa.</em></h1>
+      <p class="hero-title">Building scalable systems with PHP & Laravel — quietly engineered, deeply considered.</p>
+      <p class="hero-desc">
+        Mid-Level Backend Engineer with 3+ years crafting production-grade web applications,
+        RESTful APIs, and high-performance systems for clients across Egypt, Saudi Arabia, and the UAE.
+      </p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn-primary">
+          View Projects
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="#contact" class="btn-secondary">Get In Touch</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-portrait" id="hero-portrait">
+        <div class="portrait-corner tl"><span class="dot"></span>Available</div>
+        <img src="assets/portrait.png" alt="Portrait of Ahmed Arafa, Backend Software Engineer" loading="eager">
+        <div class="portrait-corner bl">Cairo · Egypt</div>
+        <div class="portrait-corner br">Backend Eng.</div>
+
+        <div class="portrait-card">
+          <div class="portrait-card-item">
+            <span class="portrait-card-num">3+</span>
+            <span class="portrait-card-lbl">Years</span>
+          </div>
+          <div class="portrait-card-item">
+            <span class="portrait-card-num">14+</span>
+            <span class="portrait-card-lbl">Gateways</span>
+          </div>
+          <div class="portrait-card-item">
+            <span class="portrait-card-num">9</span>
+            <span class="portrait-card-lbl">Projects</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-item">PHP 8.3<span></span></div>
+    <div class="marquee-item">Laravel 11<span></span></div>
+    <div class="marquee-item">RESTful APIs<span></span></div>
+    <div class="marquee-item">MySQL<span></span></div>
+    <div class="marquee-item">Redis<span></span></div>
+    <div class="marquee-item">Docker<span></span></div>
+    <div class="marquee-item">WebSockets<span></span></div>
+    <div class="marquee-item">Microservices<span></span></div>
+    <div class="marquee-item">SOLID Principles<span></span></div>
+    <div class="marquee-item">Clean Architecture<span></span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item">PHP 8.3<span></span></div>
+    <div class="marquee-item">Laravel 11<span></span></div>
+    <div class="marquee-item">RESTful APIs<span></span></div>
+    <div class="marquee-item">MySQL<span></span></div>
+    <div class="marquee-item">Redis<span></span></div>
+    <div class="marquee-item">Docker<span></span></div>
+    <div class="marquee-item">WebSockets<span></span></div>
+    <div class="marquee-item">Microservices<span></span></div>
+    <div class="marquee-item">SOLID Principles<span></span></div>
+    <div class="marquee-item">Clean Architecture<span></span></div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-tag fade-in">01 — expertise</div>
+    <h2 class="section-title fade-in">Technical <em>skills.</em></h2>
+    <p class="section-sub fade-in">A comprehensive stack built for performance, scalability, and clean architecture.</p>
+
+    <div class="skills-grid">
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">01</div>
+        <h3>Backend & Architecture</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">PHP 8.3</span>
+          <span class="skill-tag">Laravel 10/11</span>
+          <span class="skill-tag">RESTful APIs</span>
+          <span class="skill-tag">OOP</span>
+          <span class="skill-tag">SOLID</span>
+          <span class="skill-tag">Design Patterns</span>
+          <span class="skill-tag">Repo-Service</span>
+          <span class="skill-tag">MVC</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">02</div>
+        <h3>Auth & Security</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Laravel Sanctum</span>
+          <span class="skill-tag">Laravel Passport</span>
+          <span class="skill-tag">JWT</span>
+          <span class="skill-tag">OAuth 2.0</span>
+          <span class="skill-tag">API Auth</span>
+          <span class="skill-tag">RBAC</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">03</div>
+        <h3>Databases</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">MySQL</span>
+          <span class="skill-tag">Redis</span>
+          <span class="skill-tag">DB Design</span>
+          <span class="skill-tag">Query Optimization</span>
+          <span class="skill-tag">Indexing</span>
+          <span class="skill-tag">Migrations</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">04</div>
+        <h3>Performance & DevOps</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Redis Caching</span>
+          <span class="skill-tag">Laravel Queues</span>
+          <span class="skill-tag">Horizon</span>
+          <span class="skill-tag">Docker</span>
+          <span class="skill-tag">CI/CD</span>
+          <span class="skill-tag">Linux</span>
+          <span class="skill-tag">GitHub Actions</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">05</div>
+        <h3>Real-Time</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Laravel WebSockets</span>
+          <span class="skill-tag">Socket.IO</span>
+          <span class="skill-tag">Pusher</span>
+          <span class="skill-tag">Broadcasting</span>
+          <span class="skill-tag">Laravel Echo</span>
+        </div>
+      </div>
+
+      <div class="skill-card fade-in">
+        <div class="skill-num">06</div>
+        <h3>Integrations</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Stripe</span>
+          <span class="skill-tag">PayPal</span>
+          <span class="skill-tag">Paymob</span>
+          <span class="skill-tag">HyperPay</span>
+          <span class="skill-tag">Fawry</span>
+          <span class="skill-tag">14+ Gateways</span>
+          <span class="skill-tag">WhatsApp API</span>
+          <span class="skill-tag">Unifonic</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-tag fade-in">02 — journey</div>
+    <h2 class="section-title fade-in">Work <em>experience.</em></h2>
+    <p class="section-sub fade-in">Building real systems for real users across the MENA region.</p>
+
+    <div class="timeline">
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-date">Jul 2024 — Present</div>
+        <div class="timeline-company">AAIT <span class="loc">· Egypt, On-site</span></div>
+        <div class="timeline-role">Backend Engineer</div>
+        <ul class="timeline-points">
+          <li>Integrated <strong>18+ SMS and messaging gateways</strong> into Laravel, enabling unified multi-channel notifications.</li>
+          <li>Implemented <strong>13+ payment gateway integrations</strong> with reusable service classes, reducing future integration time.</li>
+          <li>Built secure RESTful APIs with <strong>PHP 8.3 + Laravel 10/11 + Laravel Sanctum</strong> for Saudi & UAE production systems.</li>
+          <li>Applied Repository-Service pattern, OOP, and SOLID for clean scalable architecture.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-date">Mar 2025 — Oct 2025</div>
+        <div class="timeline-company">Rowad Technology <span class="loc">· Riyadh, Remote Part-Time</span></div>
+        <div class="timeline-role">Backend Engineer</div>
+        <ul class="timeline-points">
+          <li>Improved API response time by <strong>40%</strong> through query optimization, eager loading, and Redis caching.</li>
+          <li>Reduced server costs by <strong>15%</strong> via query refactoring and efficient MySQL indexing.</li>
+          <li>Delivered payment integrations cutting checkout time by <strong>30%</strong>.</li>
+          <li>Built systems supporting onboarding of <strong>40+ partner restaurants</strong> in Egypt.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-date">Nov 2022 — Dec 2023</div>
+        <div class="timeline-company">Freelance Backend Engineer <span class="loc">· Riyadh, Remote</span></div>
+        <div class="timeline-role">Backend Engineer (Remote Contract)</div>
+        <ul class="timeline-points">
+          <li>Developed Laravel backend modules and REST APIs for SaaS platforms in the Saudi market.</li>
+          <li>Designed normalized MySQL schemas handling <strong>thousands of concurrent users</strong> with low latency.</li>
+          <li>Implemented auth, authorization, and RBAC using Laravel Sanctum.</li>
+        </ul>
+      </div>
+
+      <div class="timeline-item fade-in">
+        <div class="timeline-date">Aug 2022 — Nov 2022</div>
+        <div class="timeline-company">AAIT <span class="loc">· Egypt, On-site</span></div>
+        <div class="timeline-role">Backend Engineer</div>
+        <ul class="timeline-points">
+          <li>Built RESTful APIs with PHP & Laravel for regional production web applications.</li>
+          <li>Integrated payment gateways and third-party services for checkout and notification flows.</li>
+          <li>Implemented real-time features with Laravel WebSockets, Pusher, and optimized via Redis & Queues.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="section-tag fade-in">03 — work</div>
+    <h2 class="section-title fade-in">Live <em>projects.</em></h2>
+    <p class="section-sub fade-in">Production systems serving real users across Egypt, Saudi Arabia, and beyond.</p>
+
+    <div class="projects-grid">
+
+      <a href="https://www.willgo-sa.com/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open WillGo live site">
+        <div class="project-header">
+          <span class="project-num">/ 01</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">WillGo</div>
+        <div class="project-cat">E-commerce & Delivery Platform</div>
+        <p class="project-desc">Production-ready e-commerce and delivery platform connecting drivers and restaurants across Egypt and Saudi Arabia.</p>
+        <ul class="project-bullets">
+          <li>Contributed to dynamic subscription models, contract management, real-time chat, and zone-based admin control modules.</li>
+          <li>Implemented multi-currency support (EGP &amp; SAR) and scalable APIs serving real drivers and restaurants in both countries.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">Redis</span>
+          <span class="stack-tag">WebSockets</span>
+        </div>
+      </a>
+
+      <a href="https://provider.sefer-sa.com/auth" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open Sefer live site">
+        <div class="project-header">
+          <span class="project-num">/ 02</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">Sefer</div>
+        <div class="project-cat">Online Bookstore Platform</div>
+        <p class="project-desc">Online bookstore platform connecting customers with publishers and sellers for buying and selling books.</p>
+        <ul class="project-bullets">
+          <li>Built backend services for the customer-facing storefront, the provider portal, and the admin dashboard.</li>
+          <li>Delivered catalog management, order processing, and payments across multiple user roles.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+      <a href="https://holool-sa.net/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open Holool live site">
+        <div class="project-header">
+          <span class="project-num">/ 03</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">Holool</div>
+        <div class="project-cat">Medical Equipment Marketplace</div>
+        <p class="project-desc">Digital marketplace connecting hospitals and clinics with medical equipment providers for sales, rentals, and maintenance services.</p>
+        <ul class="project-bullets">
+          <li>Built backend modules for product listings, service requests, and order management.</li>
+          <li>Architected provider-client interactions across the entire procurement workflow.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+      <a href="https://store.loomapp.sa/auth/register/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open Loom live site">
+        <div class="project-header">
+          <span class="project-num">/ 04</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">Loom</div>
+        <div class="project-cat">Fashion Marketplace</div>
+        <p class="project-desc">Online marketplace with separate sections for men's and women's fashion, connecting customers with multiple stores and service providers.</p>
+        <ul class="project-bullets">
+          <li>Implemented product browsing, size selection, cart, and checkout workflows.</li>
+          <li>Delivered store registration and shipping coordination across multi-vendor flows.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+      <a href="https://stockones.com/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open StockOne live site">
+        <div class="project-header">
+          <span class="project-num">/ 05</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">StockOne</div>
+        <div class="project-cat">Multi-Vendor E-commerce Platform</div>
+        <p class="project-desc">Production-level multi-vendor e-commerce platform supporting users, service providers, and delivery agents.</p>
+        <ul class="project-bullets">
+          <li>Implemented full order lifecycle including returns and multi-vendor inventory management.</li>
+          <li>Centralized admin dashboard for operations monitoring across vendors.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">MySQL</span>
+          <span class="stack-tag">REST APIs</span>
+        </div>
+      </a>
+
+      <a href="https://fashion-dist.vercel.app/auth" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open FashionZid live site">
+        <div class="project-header">
+          <span class="project-num">/ 06</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">FashionZid</div>
+        <div class="project-cat">Jobs & Networking Platform</div>
+        <p class="project-desc">Full-featured admin dashboard and dual mobile app backends for jobs, networking, and provider management.</p>
+        <ul class="project-bullets">
+          <li>Built backend for two mobile apps: end-users (profiles, networking, applications) and providers (job posting, messages).</li>
+          <li>Implemented real-time chat, push notifications, and secure authentication.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">WebSockets</span>
+          <span class="stack-tag">Firebase</span>
+          <span class="stack-tag">REST APIs</span>
+        </div>
+      </a>
+
+      <a href="https://play.google.com/store/apps/details?id=sa.digitalcode.rrt" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open RRT on Google Play">
+        <div class="project-header">
+          <span class="project-num">/ 07</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">RRT</div>
+        <div class="project-cat">Emergency Medical Transport · Saudi Arabia</div>
+        <p class="project-desc">Pioneering Saudi platform revolutionizing emergency medical transportation — connecting trusted transport providers with individuals and institutions in need of fast, safe transfers.</p>
+        <ul class="project-bullets">
+          <li>Architected user, provider, and admin dashboards to manage bookings, ratings, and service offerings.</li>
+          <li>Developed the API enabling smooth, real-time communication between all components.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+      <a href="https://medicothink.com/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open Medicothink live site">
+        <div class="project-header">
+          <span class="project-num">/ 08</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">Medicothink</div>
+        <div class="project-cat">Medical Education Platform · Riyadh</div>
+        <p class="project-desc">All-in-one platform for medical students — access doctor profiles, courses, notes, past exams, and book live online tutoring sessions with specialized professors.</p>
+        <ul class="project-bullets">
+          <li>Supports subscriptions, real-time online sessions, and direct messaging between students and professors.</li>
+          <li>Contributed to backend for users and teachers apps, plus the admin dashboard for content and platform operations.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">WebSockets</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+      <a href="https://power-spare-parts.com/" target="_blank" rel="noopener" class="project-card fade-in" aria-label="Open Power Spare Parts live site">
+        <div class="project-header">
+          <span class="project-num">/ 09</span>
+          <span class="project-live">Live</span>
+        </div>
+        <div class="project-name">Power Spare</div>
+        <div class="project-cat">Car Spare Parts Marketplace</div>
+        <p class="project-desc">Online marketplace for selling car spare parts between customers and suppliers across the region.</p>
+        <ul class="project-bullets">
+          <li>Customers browse products, add to cart, and complete purchases through secure online payments.</li>
+          <li>Suppliers register and showcase products; integrated shipping companies for end-to-end delivery.</li>
+        </ul>
+        <div class="project-stack">
+          <span class="stack-tag">Laravel</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Open Source -->
+    <div class="opensource-card fade-in">
+      <div class="section-tag" style="margin-bottom:0.6rem;">open source</div>
+      <h3 style="font-family:'Fraunces',serif;font-size:1.7rem;font-weight:500;margin-bottom:0.5rem;letter-spacing:-0.025em;">Laravel <em style="font-style:italic;color:var(--text-soft);font-weight:400;">packages.</em></h3>
+      <p style="font-size:0.92rem;color:var(--text-soft);margin-bottom:0;max-width:620px;line-height:1.7;">Contributed back to the community with production-ready Laravel packages.</p>
+      <div class="os-packages">
+        <div class="os-pkg">
+          <div class="os-pkg-name">laravel-payment-gateways</div>
+          <div class="os-pkg-desc">Unified API supporting 14+ payment gateways with a single easy-to-integrate interface.</div>
+        </div>
+        <div class="os-pkg">
+          <div class="os-pkg-name">laravel-notifications-hub</div>
+          <div class="os-pkg-desc">Multi-channel notification package across 8+ platforms (WhatsApp, SMS, Slack, Telegram, Discord...).</div>
+        </div>
+        <div class="os-pkg">
+          <div class="os-pkg-name">laravel-deadcode-detector</div>
+          <div class="os-pkg-desc">Static analysis tool to identify dead code, map dependencies, and optimize the codebase.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-tag fade-in">04 — connect</div>
+    <h2 class="section-title fade-in">Get in <em>touch.</em></h2>
+
+    <div class="contact-inner">
+      <div class="fade-in">
+        <p style="font-size:1rem;color:var(--text-soft);line-height:1.8;margin-bottom:1rem;max-width:480px;">
+          Open to new opportunities, freelance projects, and collaborations.
+          Whether you need a backend engineer or want to discuss a technical problem — let's talk.
+        </p>
+        <div class="contact-links">
+          <a href="mailto:arafa.dev@gmail.com" class="contact-link">
+            <div class="contact-link-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <span class="contact-link-label">Email</span>
+              arafa.dev@gmail.com
+            </div>
+          </a>
+          <a href="https://linkedin.com/in/arafadev" target="_blank" rel="noopener" class="contact-link">
+            <div class="contact-link-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </div>
+            <div>
+              <span class="contact-link-label">LinkedIn</span>
+              linkedin.com/in/arafadev
+            </div>
+          </a>
+          <a href="https://github.com/arafadev" target="_blank" rel="noopener" class="contact-link">
+            <div class="contact-link-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </div>
+            <div>
+              <span class="contact-link-label">GitHub</span>
+              github.com/arafadev
+            </div>
+          </a>
+          <a href="tel:+201099297647" class="contact-link">
+            <div class="contact-link-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div>
+              <span class="contact-link-label">Phone</span>
+              +20 109 929 7647
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="avail-card fade-in">
+        <div class="avail-dot">Available for work · Worldwide</div>
+        <div class="avail-title">Let's build something <em>great</em> together.</div>
+        <p class="avail-desc">
+          Open to remote opportunities anywhere in the world — full-time roles, freelance projects, and long-term collaborations.
+          Time zones, borders, and stacks are flexible; great teams and meaningful problems are not.
+        </p>
+        <a href="mailto:arafa.dev@gmail.com" class="btn-primary">
+          Send a Message
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Ahmed Arafa — Designed &amp; engineered with care.</p>
+  <a href="https://github.com/arafadev" target="_blank" rel="noopener" class="footer-badge">arafadev</a>
+</footer>
+
+</div><!-- /content -->
+
+<script>
+/* ──────────────────────────────────────────────────────────
+   THEME — persistent dark/light
+   ────────────────────────────────────────────────────────── */
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const saved = localStorage.getItem('theme');
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  const initial = saved || (prefersLight ? 'light' : 'dark');
+  root.setAttribute('data-theme', initial);
+
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+})();
+
+/* ──────────────────────────────────────────────────────────
+   SMOOTH SCROLL — snappy, eased anchor navigation
+   Duration scales with distance: short for near sections,
+   capped so far sections still feel fast.
+   ────────────────────────────────────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (id === '#' || id.length < 2) return;
+    const el = document.querySelector(id);
+    if (!el) return;
+    e.preventDefault();
+    const targetY = el.getBoundingClientRect().top + window.pageYOffset - 64;
+    smoothScrollTo(targetY);
+  });
+});
+
+let scrollRAF = null;
+function smoothScrollTo(targetY) {
+  if (scrollRAF) cancelAnimationFrame(scrollRAF);
+
+  const startY = window.pageYOffset;
+  const diff = targetY - startY;
+  const distance = Math.abs(diff);
+  const duration = Math.min(650, Math.max(280, distance * 0.45));
+  const startTime = performance.now();
+  const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
+
+  function step(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, startY + diff * easeOutQuart(t));
+    if (t < 1) scrollRAF = requestAnimationFrame(step);
+    else scrollRAF = null;
+  }
+  scrollRAF = requestAnimationFrame(step);
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCROLL PROGRESS BAR
+   ────────────────────────────────────────────────────────── */
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+/* ──────────────────────────────────────────────────────────
+   MONOCHROME PARTICLE BACKGROUND
+   ────────────────────────────────────────────────────────── */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr, dpr);
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); this.y = Math.random()*H; }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.2 + 0.3;
+    this.vx = (Math.random() - 0.5) * 0.18;
+    this.vy = (Math.random() - 0.5) * 0.18;
+    this.alpha = Math.random() * 0.5 + 0.1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < -10 || this.x > W+10 || this.y < -10 || this.y > H+10) this.reset();
+  }
+  draw() {
+    const color = getComputedStyle(document.documentElement).getPropertyValue('--particle').trim();
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+  }
+}
+
+const PARTICLE_COUNT = window.innerWidth < 700 ? 50 : 90;
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+function drawConnections() {
+  const baseColor = getComputedStyle(document.documentElement).getPropertyValue('--particle').trim();
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = baseColor;
+        ctx.globalAlpha = (1 - dist/120) * 0.12;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawConnections();
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ──────────────────────────────────────────────────────────
+   SCROLL FADE-IN
+   ────────────────────────────────────────────────────────── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 70);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+/* ──────────────────────────────────────────────────────────
+   HERO PORTRAIT — subtle 3D tilt
+   ────────────────────────────────────────────────────────── */
+const heroPortrait = document.getElementById('hero-portrait');
+if (heroPortrait && window.matchMedia('(hover: hover)').matches) {
+  heroPortrait.addEventListener('mousemove', e => {
+    const r = heroPortrait.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const rx = ((e.clientY - cy) / r.height) * -4;
+    const ry = ((e.clientX - cx) / r.width) * 4;
+    heroPortrait.style.transform = `perspective(1400px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  });
+  heroPortrait.addEventListener('mouseleave', () => {
+    heroPortrait.style.transform = '';
+  });
+}
+</script>
+</body>
+</html>
