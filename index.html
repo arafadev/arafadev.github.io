@@ -2,7 +2,11 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Ahmed Arafa — Backend Software Engineer</title>
 <meta name="description" content="Ahmed Arafa — Backend Software Engineer. Building scalable systems with PHP & Laravel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,7 +56,8 @@
      ────────────────────────────────────────────────────────── */
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px;
+    scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px));
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -65,6 +70,13 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     transition: background-color 0.5s ease, color 0.5s ease;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  body.menu-open {
+    overflow: hidden;
+    touch-action: none;
   }
 
   ::selection { background: var(--text); color: var(--bg); }
@@ -95,24 +107,33 @@
   /* ──────────────────────────────────────────────────────────
      NAV
      ────────────────────────────────────────────────────────── */
-  nav {
+  .site-header {
     position: fixed;
     top: 0; left: 0; right: 0;
-    z-index: 100;
+    z-index: 200;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.1rem 3rem;
-    background: color-mix(in srgb, var(--bg) 75%, transparent);
+    gap: 1rem;
+    padding: 0.85rem max(1.25rem, env(safe-area-inset-left, 0px)) 0.85rem max(1.25rem, env(safe-area-inset-right, 0px));
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     border-bottom: 1px solid var(--line);
-    transition: background 0.5s ease, border-color 0.5s ease;
+    transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.3s ease;
+  }
+
+  .site-header.scrolled nav {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
   }
 
   .nav-logo {
     font-family: 'Fraunces', serif;
-    font-size: 1.4rem;
+    font-size: clamp(1.1rem, 4vw, 1.35rem);
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text);
@@ -120,19 +141,28 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-shrink: 0;
+    z-index: 201;
   }
 
   .nav-logo::before {
     content: '';
     display: block;
-    width: 8px; height: 8px;
+    width: 7px; height: 7px;
     background: var(--text);
     border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .nav-center {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
   }
 
   .nav-links {
     display: flex;
-    gap: 2.5rem;
+    gap: 2rem;
     align-items: center;
   }
 
@@ -143,30 +173,36 @@
     text-decoration: none;
     letter-spacing: 0.02em;
     position: relative;
-    padding: 0.25rem 0;
+    padding: 0.35rem 0;
     transition: color 0.25s;
+    white-space: nowrap;
   }
 
   .nav-links a::after {
     content: '';
     position: absolute;
-    left: 0; bottom: -2px;
+    left: 0; bottom: 0;
     width: 0; height: 1px;
     background: var(--text);
     transition: width 0.3s ease;
   }
 
-  .nav-links a:hover { color: var(--text); }
-  .nav-links a:hover::after { width: 100%; }
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--text); }
+  .nav-links a:hover::after,
+  .nav-links a.active::after { width: 100%; }
 
   .nav-right {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.65rem;
+    flex-shrink: 0;
+    z-index: 201;
   }
 
   .theme-toggle {
-    width: 38px; height: 38px;
+    width: 44px; height: 44px;
+    min-width: 44px;
     border: 1px solid var(--line);
     border-radius: 50%;
     background: transparent;
@@ -176,11 +212,10 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
   .theme-toggle:hover { border-color: var(--line-strong); transform: rotate(15deg); }
-  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle svg { width: 16px; height: 16px; pointer-events: none; }
   .theme-toggle .sun-icon  { display: none; }
   .theme-toggle .moon-icon { display: block; }
   :root[data-theme="light"] .theme-toggle .sun-icon  { display: block; }
@@ -192,13 +227,72 @@
     font-weight: 500;
     color: var(--accent-inverse);
     background: var(--accent);
-    padding: 0.6rem 1.3rem;
+    padding: 0.65rem 1.25rem;
+    min-height: 44px;
     border-radius: 100px;
     text-decoration: none;
     transition: transform 0.25s, opacity 0.25s;
     border: 1px solid var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
   }
   .nav-cta:hover { transform: translateY(-1px); opacity: 0.9; }
+
+  /* Hamburger */
+  .nav-toggle {
+    display: none;
+    width: 44px; height: 44px;
+    min-width: 44px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-elev);
+    color: var(--text);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0;
+    transition: border-color 0.25s, background 0.25s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-toggle:hover { border-color: var(--line-strong); }
+  .nav-toggle span {
+    display: block;
+    width: 18px; height: 1.5px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1), opacity 0.25s, width 0.25s;
+  }
+  .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; width: 0; }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* Mobile drawer */
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  :root[data-theme="light"] .nav-overlay { background: rgba(0,0,0,0.35); }
+
+  .nav-drawer {
+    display: none;
+  }
+
+  .nav-drawer-cta {
+    display: none;
+  }
 
   /* ──────────────────────────────────────────────────────────
      HERO
@@ -1033,19 +1127,102 @@
   /* ──────────────────────────────────────────────────────────
      FOOTER
      ────────────────────────────────────────────────────────── */
-  footer {
-    padding: 2.5rem 3rem;
+  .site-footer {
+    background: var(--bg-soft);
     border-top: 1px solid var(--line);
+    transition: background 0.5s ease;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3.5rem max(1.5rem, env(safe-area-inset-left, 0px)) 2rem max(1.5rem, env(safe-area-inset-right, 0px));
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem 2rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 1.75rem;
+  }
+
+  .footer-brand .nav-logo {
+    margin-bottom: 0.75rem;
+    font-size: 1.35rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    line-height: 1.65;
+    max-width: 280px;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-social a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    background: var(--bg-elev);
+    transition: all 0.25s;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .footer-social a:hover { color: var(--text); border-color: var(--text); }
+
+  .footer-col-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    margin-bottom: 1rem;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .footer-links a {
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.2s, transform 0.2s;
+    display: inline-block;
+    padding: 0.15rem 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .footer-links a:hover { color: var(--text); transform: translateX(3px); }
+
+  .footer-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--bg-soft);
-    transition: background 0.5s ease;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
-  footer p {
+  .footer-copy {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: var(--text-mute);
     letter-spacing: 0.02em;
   }
@@ -1055,13 +1232,19 @@
     font-size: 0.7rem;
     color: var(--text-soft);
     border: 1px solid var(--line);
-    padding: 0.4rem 0.9rem;
+    padding: 0.5rem 1rem;
+    min-height: 40px;
     border-radius: 100px;
     background: var(--bg-elev);
     text-decoration: none;
     transition: all 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    -webkit-tap-highlight-color: transparent;
   }
   .footer-badge:hover { color: var(--text); border-color: var(--text); }
+  .footer-badge::after { content: '↗'; font-size: 0.75rem; opacity: 0.6; }
 
   /* ──────────────────────────────────────────────────────────
      SCROLL ANIMATIONS
@@ -1077,12 +1260,25 @@
   /* Scroll progress bar */
   #scroll-progress {
     position: fixed;
-    top: 0; left: 0;
+    top: env(safe-area-inset-top, 0px);
+    left: 0;
     height: 2px;
     background: var(--text);
-    z-index: 1000;
+    z-index: 1001;
     width: 0%;
     transition: width 0.1s ease;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (max-width: 900px) {
+    .btn-primary,
+    .btn-secondary {
+      min-height: 48px;
+    }
   }
 
   /* Custom scrollbar */
@@ -1094,25 +1290,127 @@
   /* ──────────────────────────────────────────────────────────
      RESPONSIVE
      ────────────────────────────────────────────────────────── */
-  @media (max-width: 900px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-    section { padding: 5rem 1.5rem; }
-    #hero { padding: 7rem 1.5rem 5rem; }
-    .hero-inner { grid-template-columns: 1fr; gap: 3.5rem; }
-    .hero-portrait { max-width: 420px; margin: 0 auto; width: 100%; }
-    .portrait-card { padding: 0.8rem 1.1rem; gap: 0.9rem; }
-    .portrait-card-num { font-size: 1.1rem; }
-    .contact-inner { grid-template-columns: 1fr; gap: 2rem; }
-    footer { flex-direction: column; gap: 0.8rem; text-align: center; padding: 2rem 1.5rem; }
-    .skills-grid { grid-template-columns: 1fr; }
-    .marquee-item { font-size: 1.1rem; gap: 2rem; }
-    .marquee-track { gap: 2rem; }
+  @media (max-width: 1024px) {
+    .nav-center { display: none; }
+    .nav-toggle { display: flex; }
+    .nav-drawer-cta { display: inline-flex; }
+
+    .nav-overlay {
+      display: block;
+    }
+    .nav-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .nav-drawer {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(320px, 88vw);
+      height: 100%;
+      height: 100dvh;
+      padding: calc(5rem + env(safe-area-inset-top, 0px)) 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      background: var(--bg-elev);
+      border-left: 1px solid var(--line);
+      z-index: 200;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+      gap: 0.25rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .nav-drawer.is-open {
+      transform: translateX(0);
+    }
+
+    .nav-drawer a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      text-decoration: none;
+      padding: 1rem 0.5rem;
+      border-bottom: 1px solid var(--line);
+      letter-spacing: 0.04em;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s, padding-left 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-drawer a:hover,
+    .nav-drawer a.active {
+      color: var(--text);
+      padding-left: 0.75rem;
+    }
+
+    .nav-drawer-cta {
+      margin-top: 1.25rem;
+      width: 100%;
+      justify-content: center;
+      font-size: 0.9rem;
+      padding: 1rem 1.5rem;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
   }
 
-  @media (max-width: 500px) {
-    .nav-cta { display: none; }
-    .portrait-corner { font-size: 0.58rem; padding: 0.75rem 0.9rem; letter-spacing: 0.1em; }
+  @media (max-width: 900px) {
+    section { padding: 4.5rem max(1.25rem, env(safe-area-inset-left, 0px)) 4.5rem max(1.25rem, env(safe-area-inset-right, 0px)); }
+    #hero {
+      padding: calc(6.5rem + env(safe-area-inset-top, 0px)) max(1.25rem, env(safe-area-inset-left, 0px)) 4rem max(1.25rem, env(safe-area-inset-right, 0px));
+      min-height: auto;
+    }
+    .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    .hero-name { font-size: clamp(2.5rem, 12vw, 4rem); }
+    .hero-btns { flex-direction: column; align-items: stretch; }
+    .hero-btns .btn-primary,
+    .hero-btns .btn-secondary { justify-content: center; width: 100%; min-height: 48px; }
+    .hero-portrait { max-width: min(420px, 100%); margin: 0 auto; width: 100%; }
+    .portrait-card { padding: 0.75rem 1rem; gap: 0.75rem; max-width: calc(100% - 2rem); }
+    .portrait-card-num { font-size: 1rem; }
+    .portrait-card-lbl { font-size: 0.55rem; }
+    .contact-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .os-packages { grid-template-columns: 1fr; }
+    .marquee-item { font-size: 1.1rem; }
+    .section-title { font-size: clamp(1.85rem, 8vw, 2.5rem); }
+    .timeline { padding-left: 1.5rem; }
+    .timeline-item { padding-left: 1.5rem; }
+    .timeline-item::before { left: -1.55rem; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-cta-desktop { display: none; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .footer-social { width: 100%; }
+    .project-card { padding: 1.5rem; }
+    .project-card::after { top: 1.2rem; right: 1.2rem; }
+    .opensource-card { padding: 1.5rem; }
+    .avail-card { padding: 1.75rem; }
+    .avail-title { font-size: 1.45rem; }
+    .contact-link { padding: 1rem 1.1rem; }
+    .portrait-corner.bl,
+    .portrait-corner.br { bottom: 3.2rem; font-size: 0.6rem; }
+  }
+
+  @media (max-width: 380px) {
+    .nav-logo span.full-name { display: none; }
+    .portrait-card-item { padding: 0 0.25rem; }
+    .portrait-card-num { font-size: 0.95rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1122,6 +1420,7 @@
       scroll-behavior: auto !important;
     }
     .marquee-track { animation: none !important; }
+    .nav-drawer { transition: none !important; }
   }
 </style>
 </head>
@@ -1133,22 +1432,40 @@
 <div class="content">
 
 <!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Ahmed Arafa</a>
-  <div class="nav-links">
+<header class="site-header" id="site-header">
+  <nav aria-label="Main navigation">
+    <a href="#" class="nav-logo"><span class="full-name">Ahmed Arafa</span></a>
+
+    <div class="nav-center">
+      <div class="nav-links" id="nav-links-desktop">
+        <a href="#skills">Skills</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <a href="mailto:arafa.dev@gmail.com" class="nav-cta nav-cta-desktop">Hire Me</a>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+  <div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile menu" aria-hidden="true">
     <a href="#skills">Skills</a>
     <a href="#experience">Experience</a>
     <a href="#projects">Projects</a>
     <a href="#contact">Contact</a>
+    <a href="mailto:arafa.dev@gmail.com" class="nav-cta nav-drawer-cta">Hire Me</a>
   </div>
-  <div class="nav-right">
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-      <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-    </button>
-    <a href="mailto:arafa.dev@gmail.com" class="nav-cta">Hire Me</a>
-  </div>
-</nav>
+</header>
 
 <!-- HERO -->
 <section id="hero">
@@ -1173,7 +1490,7 @@
     <div class="hero-visual">
       <div class="hero-portrait" id="hero-portrait">
         <div class="portrait-corner tl"><span class="dot"></span>Available</div>
-        <img src="portrait.png" alt="Portrait of Ahmed Arafa, Backend Software Engineer" loading="eager">
+        <img src="assets/portrait.png" alt="Portrait of Ahmed Arafa, Backend Software Engineer" loading="eager">
         <div class="portrait-corner bl">Cairo · Egypt</div>
         <div class="portrait-corner br">Backend Eng.</div>
 
@@ -1663,9 +1980,42 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <p>© 2026 Ahmed Arafa — Designed &amp; engineered with care.</p>
-  <a href="https://github.com/arafadev" target="_blank" rel="noopener" class="footer-badge">arafadev</a>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo">Ahmed Arafa</a>
+        <p class="footer-tagline">Backend engineer building scalable Laravel systems — open to work worldwide.</p>
+        <div class="footer-social">
+          <a href="https://arafadev.github.io/" target="_blank" rel="noopener">Portfolio</a>
+          <a href="https://github.com/arafadev" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://linkedin.com/in/arafadev" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="mailto:arafa.dev@gmail.com">Email</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Navigate</div>
+        <ul class="footer-links">
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Connect</div>
+        <ul class="footer-links">
+          <li><a href="mailto:arafa.dev@gmail.com">arafa.dev@gmail.com</a></li>
+          <li><a href="tel:+201099297647">+20 109 929 7647</a></li>
+          <li><a href="https://arafadev.github.io/" target="_blank" rel="noopener">arafadev.github.io</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Ahmed Arafa — Designed &amp; engineered with care.</p>
+      <a href="https://arafadev.github.io/" target="_blank" rel="noopener" class="footer-badge">arafadev.github.io</a>
+    </div>
+  </div>
 </footer>
 
 </div><!-- /content -->
@@ -1690,9 +2040,69 @@
 })();
 
 /* ──────────────────────────────────────────────────────────
+   MOBILE NAV — collapsible drawer
+   ────────────────────────────────────────────────────────── */
+(function () {
+  const toggle = document.getElementById('nav-toggle');
+  const drawer = document.getElementById('nav-drawer');
+  const overlay = document.getElementById('nav-overlay');
+  const header = document.getElementById('site-header');
+  if (!toggle || !drawer || !overlay) return;
+
+  const drawerLinks = drawer.querySelectorAll('a[href^="#"]');
+
+  function openMenu() {
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close menu');
+    drawer.classList.add('is-open');
+    overlay.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('menu-open');
+  }
+
+  function closeMenu() {
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open menu');
+    drawer.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('menu-open');
+  }
+
+  function isMenuOpen() {
+    return toggle.getAttribute('aria-expanded') === 'true';
+  }
+
+  toggle.addEventListener('click', () => {
+    isMenuOpen() ? closeMenu() : openMenu();
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  drawerLinks.forEach(link => {
+    link.addEventListener('click', () => closeMenu());
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024 && isMenuOpen()) closeMenu();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && isMenuOpen()) closeMenu();
+  });
+
+  /* Header shadow on scroll */
+  const onScroll = () => {
+    header.classList.toggle('scrolled', window.scrollY > 12);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+/* ──────────────────────────────────────────────────────────
    SMOOTH SCROLL — snappy, eased anchor navigation
-   Duration scales with distance: short for near sections,
-   capped so far sections still feel fast.
    ────────────────────────────────────────────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
@@ -1701,7 +2111,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     const el = document.querySelector(id);
     if (!el) return;
     e.preventDefault();
-    const targetY = el.getBoundingClientRect().top + window.pageYOffset - 64;
+    const headerH = document.querySelector('.site-header')?.offsetHeight || 72;
+    const targetY = el.getBoundingClientRect().top + window.pageYOffset - headerH - 8;
     smoothScrollTo(targetY);
   });
 });
