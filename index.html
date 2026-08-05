@@ -450,12 +450,10 @@
     object-fit: cover;
     object-position: center top;
     display: block;
-    filter: grayscale(100%) contrast(1.02);
-    transition: filter 0.5s ease;
+    filter: contrast(1.02);
   }
   .portrait-slide.workshot img { object-position: center 15%; }
   .portrait-slide.deskshot img { object-position: center 20%; }
-  .hero-portrait:hover .portrait-slide img { filter: grayscale(0%) contrast(1.02); }
 
   /* gentle gradient masks for legibility */
   .hero-portrait::before {
@@ -2324,7 +2322,6 @@ if (portraitSlider && portraitDots.length) {
   const slides = portraitSlider.querySelectorAll('.portrait-slide');
   const total = slides.length;
   let current = 0;
-  let autoplayTimer = null;
   const AUTOPLAY_MS = 2000;
 
   const syncDots = () => {
@@ -2342,31 +2339,8 @@ if (portraitSlider && portraitDots.length) {
     portraitDots.forEach((dot, i) => dot.classList.toggle('active', i === current));
   };
 
-  const nextSlide = () => goToSlide(current + 1);
-
-  const startAutoplay = () => {
-    if (total <= 1) return;
-    stopAutoplay();
-    autoplayTimer = setInterval(nextSlide, AUTOPLAY_MS);
-  };
-
-  const stopAutoplay = () => {
-    if (autoplayTimer) {
-      clearInterval(autoplayTimer);
-      autoplayTimer = null;
-    }
-  };
-
-  const restartAutoplay = () => {
-    stopAutoplay();
-    startAutoplay();
-  };
-
   portraitDots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      goToSlide(Number(dot.dataset.index));
-      restartAutoplay();
-    });
+    dot.addEventListener('click', () => goToSlide(Number(dot.dataset.index)));
   });
 
   portraitSlider.addEventListener('scroll', syncDots, { passive: true });
@@ -2375,14 +2349,9 @@ if (portraitSlider && portraitDots.length) {
     goToSlide(current, false);
   });
 
-  if (heroPortrait) {
-    heroPortrait.addEventListener('mouseenter', stopAutoplay);
-    heroPortrait.addEventListener('mouseleave', startAutoplay);
-    portraitSlider.addEventListener('touchstart', stopAutoplay, { passive: true });
-    portraitSlider.addEventListener('touchend', () => setTimeout(startAutoplay, 3000), { passive: true });
+  if (total > 1) {
+    setInterval(() => goToSlide(current + 1), AUTOPLAY_MS);
   }
-
-  startAutoplay();
 }
 
 if (heroPortrait && window.matchMedia('(hover: hover)').matches) {
