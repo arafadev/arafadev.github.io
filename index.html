@@ -2321,20 +2321,68 @@ const portraitSlider = document.getElementById('portrait-slider');
 const portraitDots = document.querySelectorAll('.portrait-dot');
 
 if (portraitSlider && portraitDots.length) {
+  const slides = portraitSlider.querySelectorAll('.portrait-slide');
+  const total = slides.length;
+  let current = 0;
+  let autoplayTimer = null;
+  const AUTOPLAY_MS = 2000;
+
   const syncDots = () => {
     const index = Math.round(portraitSlider.scrollLeft / portraitSlider.clientWidth);
+    current = index;
     portraitDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+  };
+
+  const goToSlide = (index, smooth = true) => {
+    current = (index + total) % total;
+    portraitSlider.scrollTo({
+      left: current * portraitSlider.clientWidth,
+      behavior: smooth ? 'smooth' : 'auto'
+    });
+    portraitDots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+  };
+
+  const nextSlide = () => goToSlide(current + 1);
+
+  const startAutoplay = () => {
+    if (total <= 1) return;
+    stopAutoplay();
+    autoplayTimer = setInterval(nextSlide, AUTOPLAY_MS);
+  };
+
+  const stopAutoplay = () => {
+    if (autoplayTimer) {
+      clearInterval(autoplayTimer);
+      autoplayTimer = null;
+    }
+  };
+
+  const restartAutoplay = () => {
+    stopAutoplay();
+    startAutoplay();
   };
 
   portraitDots.forEach(dot => {
     dot.addEventListener('click', () => {
-      const index = Number(dot.dataset.index);
-      portraitSlider.scrollTo({ left: index * portraitSlider.clientWidth, behavior: 'smooth' });
+      goToSlide(Number(dot.dataset.index));
+      restartAutoplay();
     });
   });
 
   portraitSlider.addEventListener('scroll', syncDots, { passive: true });
-  window.addEventListener('resize', syncDots);
+
+  window.addEventListener('resize', () => {
+    goToSlide(current, false);
+  });
+
+  if (heroPortrait) {
+    heroPortrait.addEventListener('mouseenter', stopAutoplay);
+    heroPortrait.addEventListener('mouseleave', startAutoplay);
+    portraitSlider.addEventListener('touchstart', stopAutoplay, { passive: true });
+    portraitSlider.addEventListener('touchend', () => setTimeout(startAutoplay, 3000), { passive: true });
+  }
+
+  startAutoplay();
 }
 
 if (heroPortrait && window.matchMedia('(hover: hover)').matches) {
